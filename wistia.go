@@ -11,21 +11,12 @@ import (
 	"strings"
 )
 
-type WistiaResponse struct {
-	Assets []struct {
-		DisplayName string `json:"display_name"`
-		URL         string `json:"url"`
-		Height      int    `json:"height"`
-	} `json:"assets"`
-}
-
 func GetVideoIDFromCourseURL(courseURL string) (string, error) {
 	re := regexp.MustCompile(`wvideo=([a-zA-Z0-9]+)`)
 	matches := re.FindStringSubmatch(courseURL)
 	if len(matches) < 2 {
 		return "", errors.New("Wistia video ID not found")
 	}
-
 	return matches[1], nil
 }
 
@@ -46,8 +37,16 @@ func GetIframeJSON(bodyString string) (string, error) {
 		return "", errors.New("JSON data not found (regex match failed)")
 	}
 	jsonStr := matches[1]
-	jsonStr = balanceBraces(jsonStr) // Eksik kapama parantezlerini tamamla
+	jsonStr = balanceBraces(jsonStr)
 	return jsonStr, nil
+}
+
+type WistiaResponse struct {
+	Assets []struct {
+		DisplayName string `json:"display_name"`
+		URL         string `json:"url"`
+		Height      int    `json:"height"`
+	} `json:"assets"`
 }
 
 func Get1080pURL(videoID string) (string, error) {
@@ -83,7 +82,6 @@ func Get1080pURL(videoID string) (string, error) {
 			return url, nil
 		}
 	}
-
 	return "", errors.New("1080p video not found")
 }
 
@@ -108,6 +106,5 @@ func DownloadFile(url, fileName string) error {
 	if err != nil {
 		return fmt.Errorf("error writing file: %w", err)
 	}
-
 	return nil
 }
